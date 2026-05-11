@@ -9,63 +9,74 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Retro Scanline -->
+    <div class="scanlines"></div>
 
-    <!-- Navigation Bar -->
+    <!-- NavBar -->
     <nav id="navbar">
         <div class="nav-container">
             <div class="logo">OpticLog</div>
             <div class="nav-links">
                 <button onclick="openLoginModal()" class="nav-btn">Login</button>
-                <button onclick="openSignupModal()" class="nav-btn">Sign Up</button>
-                <button onclick="toggleProfile()" class="nav-btn profile-icon"><i class="fas fa-user-circle"></i></button>
+                <button onclick="openSignupModal()" class="nav-btn btn-primary">Sign Up</button>
+                <button onclick="toggleProfile()" class="nav-btn profile-icon" aria-label="Profile">
+                    <i class="fas fa-user-circle"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero">
-        <div class="hero-content">
-            <h1>Welcome to OpticLog</h1>
-            <p class="hero-subtitle">Your Personal Optical Assistant</p>
-            <p class="hero-description">
-                Keep track of your eye prescriptions in one secure place. 
-                Never lose your medical records again and get automatic reminders 
-                for your next eye check-up.
-            </p>
-            <button onclick="openSignupModal()" class="cta-button">Start Using OpticLog</button>
+    <!-- Hero-->
+    <section id="hero" class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Welcome to OpticLog</h1>
+                <p class="hero-subtitle">Your Personal Optical Assistant</p>
+                <p class="hero-description">
+                    Keep track of your eye prescriptions in one secure place. 
+                    Never lose your medical records again and get automatic reminders 
+                    for your next eye check-up.
+                </p>
+                <button onclick="openSignupModal()" class="cta-button">Start Using OpticLog</button>
+            </div>
         </div>
     </section>
 
-    <!-- Login -->
+    <!-- Login Modal -->
     <div id="login-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <span onclick="closeLoginModal()" class="close"><i class="fas fa-times"></i></span>
             <h2>Login</h2>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="login()" class="modal-btn">Login</button>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email Address">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="login()" class="modal-btn">Login</button>
+            </div>
             <p>Don't have an account? <a href="#" onclick="switchToSignup()">Sign up here</a></p>
         </div>
     </div>
 
-    <!-- Signup -->
+    <!-- Signup Modal -->
     <div id="signup-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <span onclick="closeSignupModal()" class="close"><i class="fas fa-times"></i></span>
             <h2>Create Account</h2>
-            <input type="email" id="signup-email" placeholder="Email Address">
-            <input type="password" id="signup-password" placeholder="Password">
-            <input type="password" id="signup-password-confirm" placeholder="Confirm Password">
-            <button onclick="signUp()" class="modal-btn">Sign Up</button>
+            <div class="form-group">
+                <input type="email" id="signup-email" placeholder="Email Address">
+                <input type="password" id="signup-password" placeholder="Password">
+                <input type="password" id="signup-password-confirm" placeholder="Confirm Password">
+                <button onclick="signUp()" class="modal-btn">Sign Up</button>
+            </div>
             <p>Already have an account? <a href="#" onclick="switchToLogin()">Login here</a></p>
         </div>
     </div>
 
-    <!-- Profile Menu -->
+    <!-- Profile-->
     <div id="profile-menu" class="profile-menu" style="display:none;">
         <a href="#" onclick="goToDashboard()">Dashboard</a>
         <a href="#" onclick="logout()">Logout</a>
     </div>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>

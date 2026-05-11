@@ -174,3 +174,65 @@ p {
     color: var(--primary);
 }
 
+/* Hero */
+.hero-section {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+.hero-container {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid rgba(0,255,65, 0.2);
+    padding: 3rem;
+    background: rgba(26, 26, 26, 0.4);
+    border-radius: var(--radius);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 1.5rem auto 2.5rem;
+    line-height: 1.8;
+}
+
+/* Hero: Buttons */
+
+.cta-button {
+    font-family: var(--font-pixel);
+    background: var(--primary);
+    color: var(--bg-dark);
+    font-size: 1.5rem;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: var(--radius);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+.cta-button:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+    box-shadow: 0 0 30px var(--primary);
+}
+
+.cta-button:active {
+    transform: scale(0.95);
+}

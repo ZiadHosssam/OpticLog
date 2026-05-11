@@ -69,4 +69,24 @@ p {
     color: var(--text-muted);
 }
 
+/* Navbar */
+#navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(10,10,10,0.8); 
+    backdrop-filter: blur(8px);
+    border-bottom: 2px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(0, 255, 65, 0.5);
+}
 
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

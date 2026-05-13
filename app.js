@@ -1,5 +1,5 @@
 import {config} from './config.js';
-const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
+const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
@@ -117,7 +117,7 @@ function startCountdown(targetDate) {
 
     function updateTimer(){
         const now = new Date().getTime();
-        const distance = new Date(targetDate).getTime() = now;
+        const distance = new Date(targetDate).getTime() - now;
 
         if (distance < 0) {
             timerDisplay.innerHTML = "000:00:00:00";
@@ -152,6 +152,10 @@ async function checkUser() {
 
         loadPrescriptionHistory(user.id);
         loadProfileData(user.id);
+
+        const target = new Date();
+        target.setFullYear(target.getFullYear() + 1);
+        startCountdown(target);
     }
     else {
         heroSection.style.display = 'flex';

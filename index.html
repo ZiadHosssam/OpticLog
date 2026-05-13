@@ -42,6 +42,45 @@
         </div>
     </section>
 
+    <!-- Dashboard -->
+     <section id="dashboard-area" class="dashbaord-container" style="display: none;">
+        <!-- Countdown -->
+         <div class="dash-row">
+            <div class="countdown-card">
+                <h3>Next Eye Check-up</h3>
+                <div id="countdown-timer" class="timer-display">232:13:05:10</div>
+                <p>Days : HRS: MIN: SEC</p>
+            </div>
+         </div>
+
+         <!-- History -->
+         <div class="history-section">
+            <h3>Check-Ups Archive</h3>
+            <div class="retro-table">
+                <table class="retro-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Eye</th>
+                            <th>SPH</th>
+                            <th>CYL</th>
+                            <th>Axis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <tr>
+                            <td>2024-05-12</td>
+                            <td>OD (Right)</td>
+                            <td>-2.50</td>
+                            <td>-0.75</td>
+                            <td>180</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+         </div>
+     </section>
+
     <!-- Login Modal -->
     <div id="login-modal" class="modal" style="display:none;">
         <div class="modal-content">
@@ -57,7 +96,7 @@
     </div>
 
     <!-- Signup Modal -->
-    <div id="signup-modal" class="modal" style="display:none;">
+    <div id="signup-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span onclick="closeSignupModal()" class="close"><i class="fas fa-times"></i></span>
             <h2>Create Account</h2>
@@ -72,9 +111,33 @@
     </div>
 
     <!-- Profile-->
-    <div id="profile-menu" class="profile-menu" style="display:none;">
-        <a href="#" onclick="goToDashboard()">Dashboard</a>
-        <a href="#" onclick="logout()">Logout</a>
+    <div id="profile-menu" class="profile-sidebar" style="display:none;">
+        <span onclick="toggleProfile()" class="close-sidebar">
+            <i class="fas fa-times"></i>
+        </span>
+        <div class="profile-header">
+            <i class="fas fa-user-shield"></i>
+            <h2>Profile</h2>
+        </div>
+        <div class="profile-bio">
+            <input type="text" id="user-name" placeholder="Full Name">
+            <input type="number" id="user-age" placeholder="Age">
+            <select id="user-sex">
+                <option value="">Select Sex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        <hr class="pixel-divider">
+        <button class="profile-action-btn pdf-btn" onclick="generatePDF()">
+            <i class="fas fa-file-pdf"></i> Export to PDF
+        </button>
+        <button class="profile-action-btn reset-btn" onclick="resetAccount()">
+            <i class="fas fa-trash"></i> Reset Account
+        </button>
+        <button class="profile-action-btn logout-btn" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i> Logout
+        </button>
     </div>
 
     <script src="app.js"></script>

@@ -163,6 +163,79 @@ p {
     box-shadow: 0 0 20px var(--primary);
 }
 
+/* Dashboard */
+.dashboard-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+/* Countdown Timer */
+.countdown-card {
+    background: rgba(0, 255, 65, 0.05);
+    border: 2px solid var(--primary);
+    padding: 2rem;
+    text-align: center;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.countdown-card p {
+    font-family: var(--font-pixel);
+    letter-spacing: 10px;
+    color: var(--text-muted);
+}
+
+.timer-display {
+    font-family:var(--font-pixel);
+    font-size: 5rem;
+    color:var(--primary);
+    text-shadow: 0 0 20px var(--primary);
+    letter-spacing: 5px;
+    margin: 1rem 0;
+}
+
+/* History */
+
+.history-section {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.retro-table {
+    width:100%;
+    border-collapse: collapse;
+}
+
+.retor-table th {
+    font-family: var(--font-pixel);
+    text-align: left;
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    padding: 12px;
+    text-transform: uppercase;
+}
+
+.retro-table td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+}
+
+.retro-table tr:hover {
+    background: rgba(0, 255, 65, 0.1);
+    cursor: pointer;
+}
+
 /* Navbar: Profile*/
 
 .profile-icon {
@@ -288,10 +361,10 @@ p {
 }
 
 .modal-content input {
-    background: rgba (0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--text-muted);
     padding: 12px 15px;
-    color: var(--bg-dark);
+    color: var(--text-main);
     font-family: var(--font-UI);
     border-radius: var(--radius);
     transition: all 0.3s ease;
@@ -328,4 +401,110 @@ p {
 .modal-content a {
     color: var(--primary);
     cursor:pointer;
+}
+
+/* Profile */
+.profile-sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 350px;
+    height: 100%;
+    background: #0d0d0d;
+    border-left: 2px solid var(--primary);
+    z-index: 4000;
+    padding: 2rem;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.profile-header i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.profile-bio input, .profile-bio select {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 10px;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    border-radius:4px;
+}
+
+.profile-bio input:foucs {
+    border-color: var(--primary);
+     outline:none;
+}
+
+.profile-action-btn {
+    width: 100%;
+    padding: 12px;
+    font-family: var(--font-pixel);
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    transition: 0.3s;
+    margin-bottom: 10px;
+}
+
+.close-sidebar {
+    position:absolute;
+    top:20px;
+    left: 20px;
+    color: #ff4b2b;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 4001;
+}
+.close-sidebar:hover {
+    color: #ff4b2b;
+    text-shadow: 0 0 10px #ff4b2b;
+    transform: rotate(90deg);
+}
+
+.pdf-btn {
+    background: var(--primary);
+    color: var(--bg-dark);
+}
+
+.reset-btn {
+    background: transparent;
+    border: 1px solid #ff4b2b;
+    color: #ff4b2b;
+    margin-top: auto;
+}
+.reset-btn:hover {
+    background: #ff4b2b;
+    color: white;
+}
+
+.pixel-divider {
+    border: 0;
+    border-top: 2px dashed rgba(0, 255, 65, 0.3);
+    margin:1rem 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

@@ -32,7 +32,7 @@ window.onclick = function(event) {
 
 // Popup Links
 
-window.swtichToSignup = function() {
+window.switchToSignup = function() {
     closeLoginModal();
     openSignupModal();
 };
@@ -66,7 +66,7 @@ window.toggleProfile = function() {
 window.signUp = async function() {
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    const confirmPassword = document.getElementById('signup-password-confirm').value;
 
     if (password !== confirmPassword) {
         alert('Passwords do not match!');
@@ -86,8 +86,8 @@ window.signUp = async function() {
 
 
 window.login = async function () {
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
     const {data, error} = await supabase.auth.signInWithPassword({ email, password});
 
@@ -101,7 +101,7 @@ window.login = async function () {
 }
 
 window.logout = async function() {
-    await supabase.auth.signOut;
+    await supabase.auth.signOut();
     location.reload();
 }
 
@@ -112,7 +112,7 @@ async function checkUser() {
 
     if (user) {
         heroSection.style.display = 'none';
-        dashboardArea.style.display = 'none';
+        dashboardArea.style.display = 'block';
         profileBtn.style.display = 'flex';
 
         loadPrescriptionHistory(user.id);

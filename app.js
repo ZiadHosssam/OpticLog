@@ -9,6 +9,7 @@ const dashboardArea = document.getElementById('dashboard-area');
 const profileBtn = document.querySelector('.profile-icon');
 
 
+
 // Controling Popus
 
 window.openLoginModal = function() {
@@ -108,6 +109,35 @@ window.login = async function () {
 window.logout = async function() {
     await supabaseClient.auth.signOut();
     location.reload();
+}
+
+// Countdown Timer
+function startCountdown(targetDate) {
+    const timerDisplay = document.getElementById('countdown-timer');
+
+    function updateTimer(){
+        const now = new Date().getTime();
+        const distance = new Date(targetDate).getTime() = now;
+
+        if (distance < 0) {
+            timerDisplay.innerHTML = "000:00:00:00";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const d = String(days).padStart(3, '0');
+        const h = String(hours).padStart(2, '0');
+        const m = String(minutes).padStart(2, '0');
+        const s = String(seconds).padStart(2, '0');
+
+        timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000)
 }
 
 // Controling Landing Page

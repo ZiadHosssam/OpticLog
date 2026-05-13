@@ -52,7 +52,23 @@
                 <p>Days : HRS: MIN: SEC</p>
             </div>
          </div>
-
+         <div class="add-prescription-card">
+            <h3>
+                <i class="fas fa-plus-circle">Add New Record</i>
+            </h3>
+            <form id="prescription-form" class="retro-form">
+                <div class="form-row">
+                    <select id="eye-side" required>
+                        <option value="Right">Right Eye (OD)</option>
+                        <option value="Left">Left Eye (OS)</option>
+                    </select>
+                    <input type="number" id="sph" step="0.25" placeholder="SPH" required>
+                    <input type="number" id="cyl" step="0.25" placeholder="CYL" required>
+                    <input type="number" id="axis" min="0" max="180" placeholder="Axis" required>
+                    <button type="submit" class="add-btn">Save Record</button>
+                </div>
+            </form>
+         </div>
          <!-- History -->
          <div class="history-section">
             <h3>Check-Ups Archive</h3>
@@ -65,6 +81,7 @@
                             <th>SPH</th>
                             <th>CYL</th>
                             <th>Axis</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="history-body">

@@ -110,7 +110,41 @@ window.logout = async function() {
     await supabaseClient.auth.signOut();
     location.reload();
 }
+// Adding Data
 
+document.getElementById('prescription-form')?.addEventListener('submit', async(e) =>{
+    e.preventDefault();
+    const {data: {user}} = await supabaseClient.auth.getUser();
+    const newRecord = {
+        user_id: user.id,
+        eye: document.getElementById('eye-side').value,
+        sph: parseFloat(document.getElementById('sph').value),
+        cyl: parseFloat(document.getElementById('sph').value),
+        axis: parseInt(document.getElementById('axis').value), 
+    };
+
+    const {error} = await supabaseClient.from('prescriptions').insert([newRecord]);
+    if (error) {
+        alert("Error Saving!! " + error.message);
+    }
+    else {
+        document.getElementById('prescription-form').reset();
+        loadPrescriptionHistory(user.id);
+    }
+});
+
+window.deletePrescription = async function(id) {
+    if (!confirm("Are Sure Brother?")) return;
+
+    const{error} = await supabaseClient.from(prescriptions).delete().eq('id',id);
+    if (error){
+        alert("Error Deleting!! " + error.message);
+    }
+    else {
+        const{data:{user}} = await supabaseClient.auth.getUser();
+        loadPrescriptionHistory(user.id);
+    }
+};
 // Countdown Timer
 function startCountdown(targetDate) {
     const timerDisplay = document.getElementById('countdown-timer');
@@ -185,8 +219,13 @@ async function loadPrescriptionHistory(userId) {
                 <td>${row.sph}</td>
                 <td>${row.cyl}</td>
                 <td>${row.axis}</td>
+                <td>
+                    <button class="delete-row-btn" onclick="deletePrescription('${row.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             </tr>
-        `
+        `;
     });
 }
 

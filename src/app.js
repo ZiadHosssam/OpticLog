@@ -7,7 +7,8 @@ const profileMenu = document.getElementById('profile-menu');
 const heroSection = document.getElementById('hero');
 const dashboardArea = document.getElementById('dashboard-area');
 const profileBtn = document.querySelector('.profile-icon');
-
+const loginNavBtn = document.getElementById('login-nav-btn');
+const signupNavBtn = document.getElementById('signup-nav-btn');
 
 // Controling Popus
 
@@ -188,6 +189,8 @@ async function checkUser() {
             heroSection.style.display = 'none';
             dashboardArea.style.display = 'block';
             profileBtn.style.display = 'flex';
+            loginNavBtn.style.display = 'none';
+            signupNavBtn.style.display = 'none';
             await loadPrescriptionHistory(user.id);
             if (typeof loadProfileData === "function") {
                 await loadProfileData(user.id);
@@ -200,6 +203,8 @@ async function checkUser() {
             heroSection.style.display = 'flex';
             dashboardArea.style.display = 'none';
             profileBtn.style.display = 'none';
+            loginNavBtn.style.display = 'block';
+            signupNavBtn.style.display = 'block';
         }
     } catch (err) {
         console.error("Authentication check failed:", err.message);

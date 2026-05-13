@@ -142,7 +142,7 @@ p {
     cursor: pointer;
     padding: 5px 10px;
     border: 1px solid transparent;
-    transition: all 0.2s ease;
+    transition: opacity 0.3s ease, transform 0.2s ease;
 }
 
 .nav-btn:hover {

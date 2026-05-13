@@ -239,6 +239,7 @@ p {
 /* Navbar: Profile*/
 
 .profile-icon {
+    display:none;
     font-size: 1.5rem;
     color: var(--text-muted);
 }

@@ -1,10 +1,12 @@
-import CONFIG from './config.js';
-const supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+import {config} from './config.js';
+const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
 const profileMenu = document.getElementById('profile-menu');
-
+const heroSection = document.getElementById('hero');
+const dashboardArea = document.getElementById('dashboard-area');
+const profileBtn = document.querySelector('.profile-icon');
 
 
 // Controling Popus
@@ -76,7 +78,7 @@ window.signUp = async function() {
         return;
     }
 
-    const {data, error} = await supabase.auth.signUp({email, password});
+    const {data, error} = await supabaseClient.auth.signUp({email, password});
 
     if (error) {
         alert(error.message);
@@ -92,7 +94,7 @@ window.login = async function () {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    const {data, error} = await supabase.auth.signInWithPassword({ email, password});
+    const {data, error} = await supabaseClient.auth.signInWithPassword({ email, password});
 
     if (error) {
         alert(error.message);
@@ -104,14 +106,14 @@ window.login = async function () {
 }
 
 window.logout = async function() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     location.reload();
 }
 
 // Controling Landing Page
 
 async function checkUser() {
-    const {data: {user}} = await supabase.auth.getUser();
+    const {data: {user}} = await supabaseClient.auth.getUser();
 
     if (user) {
         heroSection.style.display = 'none';
@@ -133,7 +135,7 @@ checkUser();
 // Fetching Data
 
 async function loadPrescriptionHistory(userId) {
-    const {data, error} = await supabase.from('prescriptions').select('*').eq('user_id', userId).order('created_at', {ascending: false});
+    const {data, error} = await supabaseClient.from('prescriptions').select('*').eq('user_id', userId).order('created_at', {ascending: false});
     if (error) {
         console.error('Error fetching prescription history:', error);
     }

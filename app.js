@@ -1,3 +1,6 @@
+import CONFIG from './config.js';
+const supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
 const profileMenu = document.getElementById('profile-menu');

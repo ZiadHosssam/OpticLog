@@ -1,4 +1,5 @@
 import {config} from './config.js';
+const apiKey = import.meta.env.VITE_RESEND_API_KEY;
 const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
 const loginModal = document.getElementById('login-modal');
@@ -159,7 +160,9 @@ function startCountdown(targetDate) {
         const distance = new Date(targetDate).getTime() - now;
 
         if (distance < 0) {
-            timerDisplay.innerHTML = "000:00:00:00";
+            timerDisplay.innerHTML = "DEADLINE ARRIVED";
+            timerDisplay.style.color = "#ff4b2b";
+            timerDisplay.style.fontSize = "3rem";
             return;
         }
 
@@ -179,6 +182,26 @@ function startCountdown(targetDate) {
     setInterval(updateTimer, 1000)
 }
 
+async function sendCheckupReminder(userEmail, userName) {
+    const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apikey}`
+        },
+        body: JSON.stringify({
+            from: "OpticLog <onboarding@resend.dev>",
+            to: [userEmail],
+            subject: "OPTIC_LOG: Check-Up Needed Brother",
+            html: `<h1>Time for a check-up!</h1><p>Hey ${userName}, it has been 3 months since your last scan.</p>`
+        })
+    });
+
+    if (res.ok) {
+        console.log("Reminder email dispatched.");
+    }
+}
+
 // Controling Landing Page
 
 async function checkUser() {
@@ -191,6 +214,20 @@ async function checkUser() {
             profileBtn.style.display = 'flex';
             loginNavBtn.style.display = 'none';
             signupNavBtn.style.display = 'none';
+            const today = new Date();
+            const history = await loadPrescriptionHistory(user.id);
+            const history = await loadPrescriptionHistory(user.id);
+            if (history && history.length > 0){
+                const latestDate  = new Date(history[0].date);
+                const nextCheckup = new Date(latestDate);
+                nextCheckup.setMonth(nextCheckup.getMonth() + 3);
+                startCountdown(nextCheckup);
+                const diffTime = Math.abs(today - latestDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays >= 90) {
+                    sendCheckupReminder(user.email, 'Valued Member');
+                }
+            }
             await loadPrescriptionHistory(user.id);
             if (typeof loadProfileData === "function") {
                 await loadProfileData(user.id);
@@ -267,6 +304,7 @@ async function loadPrescriptionHistory(userId) {
         `;
         grid.insertAdjacentHTML('beforeend', card);
     });
+    return data;
 }
 async function loadProfileData(userId) {
     console.log("Loading profile for user:", userId);

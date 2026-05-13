@@ -5,28 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpticLog - Your Optical Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Retro Scanline -->
+    <!-- Scanline Overlay -->
     <div class="scanlines"></div>
 
-    <!-- NavBar -->
+    <!-- Navbar-->
     <nav id="navbar">
         <div class="nav-container">
             <div class="logo">OpticLog</div>
             <div class="nav-links">
-                <button onclick="openLoginModal()" class="nav-btn">Login</button>
-                <button onclick="openSignupModal()" class="nav-btn btn-primary">Sign Up</button>
-                <button onclick="toggleProfile()" class="nav-btn profile-icon" aria-label="Profile">
+                <button id="login-nav-btn" onclick="openLoginModal()" class="nav-btn">Login</button>
+                <button id="signup-nav-btn" onclick="openSignupModal()" class="nav-btn btn-primary">Sign Up</button>
+                <button id="profile-nav-btn" onclick="toggleProfile()" class="nav-btn profile-icon" aria-label="Profile" style="display:none;">
                     <i class="fas fa-user-circle"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero-->
+    <!-- Hero -->
     <section id="hero" class="hero-section">
         <div class="hero-container">
             <div class="hero-content">
@@ -43,60 +43,68 @@
     </section>
 
     <!-- Dashboard -->
-     <section id="dashboard-area" class="dashboard-container" style="display: none;">
-        <!-- Countdown -->
-         <div class="dash-row">
+    <section id="dashboard-area" class="dashboard-container">
+        <!-- Countdown Timer -->
+        <div class="dash-row">
             <div class="countdown-card">
                 <h3>Next Eye Check-up</h3>
                 <div id="countdown-timer" class="timer-display">000:00:00:00</div>
-                <p>Days : HRS: MIN: SEC</p>
+                <p>DAYS : HRS : MIN : SEC</p>
             </div>
-         </div>
-         <div class="add-prescription-card">
-            <h3>
-                <i class="fas fa-plus-circle">Add New Record</i>
-            </h3>
-            <form id="prescription-form" class="retro-form">
-                <div class="form-row">
-                    <select id="eye-side" required>
-                        <option value="right">Right Eye (OD)</option>
-                        <option value="left">Left Eye (OS)</option>
-                    </select>
-                    <input type="number" id="sph" step="0.25" placeholder="SPH" required>
-                    <input type="number" id="cyl" step="0.25" placeholder="CYL" required>
-                    <input type="number" id="axis" min="0" max="180" placeholder="Axis" required>
-                    <button type="submit" class="add-btn">Save Record</button>
-                </div>
-            </form>
-         </div>
-         <!-- History -->
-         <div class="history-section">
-            <h3>Check-Ups Archive</h3>
-            <div class="retro-table">
-                <table class="retro-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Eye</th>
-                            <th>SPH</th>
-                            <th>CYL</th>
-                            <th>Axis</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-body">
-                        <tr>
-                            <td colspan="5" style="text-align: center; opacity: 0.5;">
-                                Loading your history...
-                            </td>
-                        </tr>
-                     </tbody>
-                </table>
-            </div>
-         </div>
-     </section>
+        </div>
 
-    <!-- Login Modal -->
+        <!-- Medical Action Buttons -->
+        <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2><i class="fas fa-archive"></i> Records Archive</h2>
+            <button onclick="openRecordModal()" class="cta-button">
+                <i class="fas fa-file-medical"></i> New Entry
+            </button>
+        </div>
+
+        <!-- History -->
+        <div id="history-grid" class="history-grid">
+            <!-- Folder cards are injected here by app.js -->
+            <p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">
+                Accessing secure database...
+            </p>
+        </div>
+    </section>
+
+    <!-- New Record -->
+    <div id="record-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <span onclick="closeRecordModal()" class="close"><i class="fas fa-times"></i></span>
+            <h2>Create New Log</h2>
+            <form id="full-record-form" class="form-group">
+                <div style="text-align: left; margin-bottom: 1rem;">
+                    <label style="font-family: var(--font-pixel); color: var(--primary);">EXAM_DATE:</label>
+                    <input type="date" id="record-date" required style="width: 100%;">
+                </div>
+                
+                <div class="form-row" style="display: flex; gap: 20px;">
+                    <!-- Right Eye Group -->
+                    <div class="eye-input-group" style="flex: 1;">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px;">RIGHT (OD)</h3>
+                        <input type="number" id="r-sph" placeholder="SPH" step="0.25" required>
+                        <input type="number" id="r-cyl" placeholder="CYL" step="0.25" required>
+                        <input type="number" id="r-axis" placeholder="AXIS" required>
+                    </div>
+                    <!-- Left Eye Group -->
+                    <div class="eye-input-group" style="flex: 1;">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px;">LEFT (OS)</h3>
+                        <input type="number" id="l-sph" placeholder="SPH" step="0.25" required>
+                        <input type="number" id="l-cyl" placeholder="CYL" step="0.25" required>
+                        <input type="number" id="l-axis" placeholder="AXIS" required>
+                    </div>
+                </div>
+                <button type="submit" class="modal-btn" style="width: 100%; margin-top: 20px;">
+                    COMMIT_TO_DATABASE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Singup & Login -->
     <div id="login-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <span onclick="closeLoginModal()" class="close"><i class="fas fa-times"></i></span>
@@ -110,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Signup Modal -->
     <div id="signup-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span onclick="closeSignupModal()" class="close"><i class="fas fa-times"></i></span>
@@ -125,14 +132,14 @@
         </div>
     </div>
 
-    <!-- Profile-->
+    <!-- Profile -->
     <div id="profile-menu" class="profile-sidebar" style="display:none;">
         <span onclick="toggleProfile()" class="close-sidebar">
             <i class="fas fa-times"></i>
         </span>
         <div class="profile-header">
             <i class="fas fa-user-shield"></i>
-            <h2>Profile</h2>
+            <h2>User Profile</h2>
         </div>
         <div class="profile-bio">
             <input type="text" id="user-name" placeholder="Full Name">
@@ -145,13 +152,13 @@
         </div>
         <hr class="pixel-divider">
         <button class="profile-action-btn pdf-btn" onclick="generatePDF()">
-            <i class="fas fa-file-pdf"></i> Export to PDF
+            <i class="fas fa-file-pdf"></i> Export Archive
         </button>
         <button class="profile-action-btn reset-btn" onclick="resetAccount()">
-            <i class="fas fa-trash"></i> Reset Account
+            <i class="fas fa-trash"></i> Reset Data
         </button>
         <button class="profile-action-btn logout-btn" onclick="logout()">
-            <i class="fas fa-right-from-bracket"></i> Logout
+            <i class="fas fa-right-from-bracket"></i> System Logout
         </button>
     </div>
 

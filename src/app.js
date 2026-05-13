@@ -9,7 +9,6 @@ const dashboardArea = document.getElementById('dashboard-area');
 const profileBtn = document.querySelector('.profile-icon');
 
 
-
 // Controling Popus
 
 window.openLoginModal = function() {
@@ -49,16 +48,6 @@ window.switchToLogin = function() {
 };
 
 // Profile
-window.toggleProfile = function() {
-    if (profileMenu.style.display === 'none' || profileMenu.style.display === '') {
-        profileMenu.style.display = 'block';
-    }
-    else {
-        profileMenu.style.display = 'none';
-    }
-};
-
-
 window.toggleProfile = function() {
     if (profileMenu.style.display === 'none' || profileMenu.style.display === '') {
         profileMenu.style.display = 'block';
@@ -112,23 +101,38 @@ window.logout = async function() {
 }
 // Adding Data
 
-document.getElementById('prescription-form')?.addEventListener('submit', async(e) =>{
+window.openRecordModal = function() {
+    document.getElementById('record-modal').style.display = 'flex';
+};
+
+window.closeRecordModal = function() {
+    document.getElementById('record-modal').style.display = 'none';
+};
+
+document.getElementById('full-record-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const {data: {user}} = await supabaseClient.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    
     const newRecord = {
         user_id: user.id,
-        eye: document.getElementById('eye-side').value,
-        sph: parseFloat(document.getElementById('sph').value),
-        cyl: parseFloat(document.getElementById('sph').value),
-        axis: parseInt(document.getElementById('axis').value), 
+        date: document.getElementById('record-date').value,
+        // Right Eye Data
+        r_sph: parseFloat(document.getElementById('r-sph').value),
+        r_cyl: parseFloat(document.getElementById('r-cyl').value),
+        r_axis: parseInt(document.getElementById('r-axis').value),
+        // Left Eye Data
+        l_sph: parseFloat(document.getElementById('l-sph').value),
+        l_cyl: parseFloat(document.getElementById('l-cyl').value),
+        l_axis: parseInt(document.getElementById('l-axis').value),
     };
 
-    const {error} = await supabaseClient.from('prescriptions').insert([newRecord]);
+    const { error } = await supabaseClient.from('prescriptions').insert([newRecord]);
+    
     if (error) {
         alert("Error Saving!! " + error.message);
-    }
-    else {
-        document.getElementById('prescription-form').reset();
+    } else {
+        document.getElementById('full-record-form').reset();
+        closeRecordModal();
         loadPrescriptionHistory(user.id);
     }
 });
@@ -136,7 +140,7 @@ document.getElementById('prescription-form')?.addEventListener('submit', async(e
 window.deletePrescription = async function(id) {
     if (!confirm("Are Sure Brother?")) return;
 
-    const{error} = await supabaseClient.from(prescriptions).delete().eq('id',id);
+    const{error} = await supabaseClient.from('prescriptions').delete().eq('id',id);
     if (error){
         alert("Error Deleting!! " + error.message);
     }
@@ -177,24 +181,30 @@ function startCountdown(targetDate) {
 // Controling Landing Page
 
 async function checkUser() {
-    const {data: {user}} = await supabaseClient.auth.getUser();
+    try {
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
+        if (error) throw error;
+        if (user) {
+            heroSection.style.display = 'none';
+            dashboardArea.style.display = 'block';
+            profileBtn.style.display = 'flex';
+            await loadPrescriptionHistory(user.id);
+            if (typeof loadProfileData === "function") {
+                await loadProfileData(user.id);
+            }
+            const target = new Date();
+            target.setFullYear(target.getFullYear() + 1);
+            startCountdown(target);
 
-    if (user) {
-        heroSection.style.display = 'none';
-        dashboardArea.style.display = 'block';
-        profileBtn.style.display = 'flex';
-
-        loadPrescriptionHistory(user.id);
-        loadProfileData(user.id);
-
-        const target = new Date();
-        target.setFullYear(target.getFullYear() + 1);
-        startCountdown(target);
-    }
-    else {
+        } else {
+            heroSection.style.display = 'flex';
+            dashboardArea.style.display = 'none';
+            profileBtn.style.display = 'none';
+        }
+    } catch (err) {
+        console.error("Authentication check failed:", err.message);
         heroSection.style.display = 'flex';
         dashboardArea.style.display = 'none';
-        profileBtn.style.display = 'none';
     }
 }
 
@@ -203,29 +213,56 @@ checkUser();
 // Fetching Data
 
 async function loadPrescriptionHistory(userId) {
-    const {data, error} = await supabaseClient.from('prescriptions').select('*').eq('user_id', userId).order('created_at', {ascending: false});
+    const { data, error } = await supabaseClient
+        .from('prescriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+
     if (error) {
-        console.error('Error fetching prescription history:', error);
+        console.error('Error fetching history:', error);
+        return;
     }
 
-    const tbody = document.getElementById('history-body');
-    tbody.innerHTML = '';
+    const grid = document.getElementById('history-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
 
-    data.forEach(row => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${new Date(row.created_at).toLocaleDateString()}</td>
-                <td>${row.eye}</td>
-                <td>${row.sph}</td>
-                <td>${row.cyl}</td>
-                <td>${row.axis}</td>
-                <td>
-                    <button class="delete-row-btn" onclick="deletePrescription('${row.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
+    if (data.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No records found in the archive.</p>';
+        return;
+    }
+
+    data.forEach((entry, index) => {
+        const recordNum = (data.length - index).toString().padStart(2, '0');
+
+        const card = `
+            <div class="folder-card">
+                <div class="prescription-number">#${recordNum}</div>
+                <div class="folder-date">DATE: ${entry.date}</div>
+                <div class="folder-content">
+                    <div class="eye-data">
+                        <h4>RIGHT (OD)</h4>
+                        <p>SPH: ${entry.r_sph}</p>
+                        <p>CYL: ${entry.r_cyl}</p>
+                        <p>AXIS: ${entry.r_axis}</p>
+                    </div>
+                    <div class="eye-data">
+                        <h4>LEFT (OS)</h4>
+                        <p>SPH: ${entry.l_sph}</p>
+                        <p>CYL: ${entry.l_cyl}</p>
+                        <p>AXIS: ${entry.l_axis}</p>
+                    </div>
+                </div>
+                <button class="delete-folder-btn" onclick="deletePrescription('${entry.id}')">
+                    <i class="fas fa-trash-alt"></i> PURGE_FILE
+                </button>
+            </div>
         `;
+        grid.insertAdjacentHTML('beforeend', card);
     });
 }
-
+async function loadProfileData(userId) {
+    console.log("Loading profile for user:", userId);
+}

@@ -197,6 +197,92 @@ p {
 }
 
 /* History */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.folder-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 2px solid var(--primary);
+    padding: 1.5rem;
+    padding-top: 2.5rem;
+    border-radius: 0 8px 8px 8px;
+    box-shadow: 5px 5px 0px var(--primary-dark);
+    transition: transform 0.2 ease;
+}
+.folder-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px var(--primary);
+}
+
+.folder-card::before {
+    content: "FILE_LOG";
+    position: absolute;
+    top: -22px;
+    left: -2px;
+    height: 22px;
+    width: 100px;
+    background: var(--primary);
+    color: var(--bg-dark);
+    font-family: var(--font-pixel);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(0% 0%, 85% 0%, 100% 100%, 0% 100%);
+}
+.folder-date {
+    font-family: var(--font-pixel);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    border-bottom: 1px dashed rgba(0, 255, 65, 0.3);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.prescription-number {
+    background: var(--primary);
+    color: var(--bg-dark);
+    padding: 0 5px;
+}
+
+.eye-data h4 {
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.eye-data p {
+    font-size: 0.85rem;
+    margin: 2px 0;
+}
+
+.delete-folder-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: transparent;
+    color: #ff4b2b;
+    border: 1px solid #ff4b2b;
+    padding: 5px 10px;
+    font-family: var(--font-pixel);
+    cursor: pointer;
+}
+
+.delete-folder-btn:hover {
+    background: #ff4b2b;
+    color: white;
+}
+.folder-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
 
 .history-section {
     background: var(--card-bg);

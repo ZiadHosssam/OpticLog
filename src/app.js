@@ -216,7 +216,6 @@ async function checkUser() {
             signupNavBtn.style.display = 'none';
             const today = new Date();
             const history = await loadPrescriptionHistory(user.id);
-            const history = await loadPrescriptionHistory(user.id);
             if (history && history.length > 0){
                 const latestDate  = new Date(history[0].date);
                 const nextCheckup = new Date(latestDate);

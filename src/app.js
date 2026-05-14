@@ -1,8 +1,45 @@
 import {config} from './config.js';
 let countdownInterval;
+let editingRecordId = null;
+let debounceTimer = null;
 
 const apiKey = import.meta.env.VITE_RESEND_API_KEY;
 const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
+
+// Toast Notification System
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="toast-close">&times;</button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+// Debounce helper
+function debounce(func, delay = 300) {
+    return function(...args) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func(...args), delay);
+    };
+}
+
+// Loading indicator
+function showLoading(show = true) {
+    let loader = document.getElementById('global-loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'global-loader';
+        loader.className = 'global-loader';
+        loader.innerHTML = '<div class="loader-spinner"></div>';
+        document.body.appendChild(loader);
+    }
+    loader.style.display = show ? 'flex' : 'none';
+}
 
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
@@ -62,68 +99,76 @@ window.toggleProfile = function() {
 
 window.generatePDF = async function() {
     const {data: { user }} = await supabaseClient.auth.getUser();
-    if (!user) return alert("Please Login First!");
+    if (!user) return showToast("Please login first!", 'error');
 
     const {data: prescriptions, error} = await supabaseClient.from('prescriptions').select('*').eq('user_id', user.id).order('date', { ascending: false });
 
     if (error || !prescriptions || prescriptions.length === 0) {
-        alert("No records found to export.");
+        showToast("No records found to export.", 'warning');
         return;
     }
 
-    const {jsPDF} = window.jspdf;
-    const doc = new jsPDF();
-
-    doc.setFont("courier", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(0, 255, 136);
-    doc.text("Optic-Log: Check-Up History", 14, 20);
-
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-
-    const profileName = document.getElementById('user-name').value || user.name || 'N/A';
-    const profileAge = document.getElementById('user-age').value || 'N/A';
-    const profileSex = document.getElementById('user-sex').value || 'N/A';
-
-    doc.text(`Name: ${profileName}`, 14, 30);
-    doc.text(`Age: ${profileAge}`, 14, 37);
-    doc.text(`Sex: ${profileSex}`, 14, 44);
-    doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 51);
-
-    let currentY = 60;
-
-    prescriptions.forEach((record, index) => {
-        if (currentY > 250) {
-            doc.addPage();
-            currentY = 20;
-        }
-
-        doc.setDrawColor(0, 255, 136);
-        doc.setLineWidth(0.5);
-        doc.rect(14, currentY, 182, 40);
+    showLoading(true);
+    try {
+        const {jsPDF} = window.jspdf;
+        const doc = new jsPDF();
 
         doc.setFont("courier", "bold");
-        doc.setFontSize(11);
+        doc.setFontSize(22);
         doc.setTextColor(0, 255, 136);
-        doc.text(`Check-Up #${index + 1} - ${record.date}`, 18, currentY + 8);
+        doc.text("Optic-Log: Check-Up History", 14, 20);
 
-        doc.setFont("courier", "normal");
-        doc.setFontSize(10);
+        doc.setFontSize(12);
         doc.setTextColor(100);
 
-        doc.text(`RIGHT (OD): SPH ${record.r_sph.toFixed(2)} | CYL ${record.r_cyl.toFixed(2)} | AXIS ${record.r_axis}`, 18, currentY + 18);
-        doc.text(`LEFT (OS):  SPH ${record.l_sph.toFixed(2)} | CYL ${record.l_cyl.toFixed(2)} | AXIS ${record.l_axis}`, 18, currentY + 28);
+        const profileName = document.getElementById('user-name').value || user.email || 'User';
+        const profileAge = document.getElementById('user-age').value || 'N/A';
+        const profileSex = document.getElementById('user-sex').value || 'N/A';
 
-        currentY += 48;
-    });
+        doc.text(`Name: ${profileName}`, 14, 30);
+        doc.text(`Age: ${profileAge}`, 14, 37);
+        doc.text(`Sex: ${profileSex}`, 14, 44);
+        doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 51);
 
-    currentY += 10;
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("--- End Of Check-Ups ---", 14, currentY);
+        let currentY = 60;
 
-    doc.save(`OpticLog_Report_${user.id.substring(0, 5)}.pdf`);
+        prescriptions.forEach((record, index) => {
+            if (currentY > 250) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            doc.setDrawColor(0, 255, 136);
+            doc.setLineWidth(0.5);
+            doc.rect(14, currentY, 182, 40);
+
+            doc.setFont("courier", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(0, 255, 136);
+            doc.text(`Check-Up #${index + 1} - ${record.date}`, 18, currentY + 8);
+
+            doc.setFont("courier", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+
+            doc.text(`RIGHT (OD): SPH ${record.r_sph.toFixed(2)} | CYL ${record.r_cyl.toFixed(2)} | AXIS ${record.r_axis}`, 18, currentY + 18);
+            doc.text(`LEFT (OS):  SPH ${record.l_sph.toFixed(2)} | CYL ${record.l_cyl.toFixed(2)} | AXIS ${record.l_axis}`, 18, currentY + 28);
+
+            currentY += 48;
+        });
+
+        currentY += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("--- End Of Check-Ups ---", 14, currentY);
+
+        doc.save(`OpticLog_Report_${user.id.substring(0, 5)}.pdf`);
+        showToast('✓ PDF generated successfully', 'success');
+    } catch (err) {
+        showToast('Error generating PDF: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
+    }
 }
 
 // Login & Logout & Signup
@@ -134,18 +179,21 @@ window.signUp = async function() {
     const confirmPassword = document.getElementById('signup-password-confirm').value;
 
     if (password !== confirmPassword) {
-        alert('Passwords do not match!');
+        showToast('Passwords do not match!', 'error');
         return;
     }
 
-    const {data, error} = await supabaseClient.auth.signUp({email, password});
+    showLoading(true);
+    try {
+        const {data, error} = await supabaseClient.auth.signUp({email, password});
 
-    if (error) {
-        alert(error.message);
-    }
-    else {
-        alert("Check Your Email For Verification!!");
+        if (error) throw error;
+        showToast('✓ Check your email for verification!', 'success');
         closeSignupModal();
+    } catch (err) {
+        showToast('Signup error: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
     }
 }
 
@@ -154,13 +202,23 @@ window.login = async function () {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    const {data, error} = await supabaseClient.auth.signInWithPassword({ email, password});
+    if (!email || !password) {
+        showToast('Please enter email and password', 'warning');
+        return;
+    }
 
-    if (error) {
-        alert(error.message);
-    } else {
+    showLoading(true);
+    try {
+        const {data, error} = await supabaseClient.auth.signInWithPassword({ email, password});
+
+        if (error) throw error;
+        showToast('✓ Logged in successfully', 'success');
         closeLoginModal();
         checkUser();
+    } catch (err) {
+        showToast('Login error: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
     }
 }
 
@@ -171,11 +229,12 @@ window.logout = async function() {
 
 window.resetAccount = async function() {
     if (!confirm("🔴 WARNING: This will DELETE all your checkup records. This action CANNOT be undone!")) return;
-    if (!confirm("Are you ABSOLUTELY sure? Type 'DELETE' to confirm... (Just kidding, click OK again to proceed)")) return;
+    if (!confirm("Are you ABSOLUTELY sure? Click OK again to proceed")) return;
 
+    showLoading(true);
     try {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) return alert("Please login first!");
+        if (!user) return showToast("Please login first!", 'error');
 
         const { error } = await supabaseClient
             .from('prescriptions')
@@ -184,56 +243,116 @@ window.resetAccount = async function() {
 
         if (error) throw error;
 
-        alert("✓ All records have been purged from the system.");
-        checkUser();
+        showToast("✓ All records have been purged from the system.", 'success');
+        await checkUser();
     } catch (err) {
-        alert("Error resetting account: " + err.message);
+        showToast("Error resetting account: " + err.message, 'error');
+    } finally {
+        showLoading(false);
     }
 }
 // Adding Data
 
-window.openRecordModal = function() {
+window.openRecordModal = function(recordId = null) {
+    editingRecordId = recordId;
+    if (recordId) {
+        document.querySelector('.modal-content h2').textContent = '✏️ Edit Check-Up Log';
+        document.querySelector('.modal-btn').textContent = '✓ UPDATE_RECORD';
+    } else {
+        document.querySelector('.modal-content h2').textContent = '📋 Create New Check-Up Log';
+        document.querySelector('.modal-btn').textContent = '✓ COMMIT_TO_DATABASE';
+        document.getElementById('full-record-form').reset();
+    }
     document.getElementById('record-modal').style.display = 'flex';
 };
 
 window.closeRecordModal = function() {
+    editingRecordId = null;
     document.getElementById('record-modal').style.display = 'none';
+    document.getElementById('full-record-form').reset();
 };
 
 document.getElementById('full-record-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    showLoading(true);
 
-    const newRecord = {
-        user_id: user.id,
-        date: document.getElementById('record-date').value,
-        r_sph: parseFloat(document.getElementById('r-sph').value),
-        r_cyl: parseFloat(document.getElementById('r-cyl').value),
-        r_axis: parseInt(document.getElementById('r-axis').value),
-        l_sph: parseFloat(document.getElementById('l-sph').value),
-        l_cyl: parseFloat(document.getElementById('l-cyl').value),
-        l_axis: parseInt(document.getElementById('l-axis').value),
-    };
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
 
-    const { error } = await supabaseClient.from('prescriptions').insert([newRecord]);
+        const recordData = {
+            user_id: user.id,
+            date: document.getElementById('record-date').value,
+            r_sph: parseFloat(document.getElementById('r-sph').value),
+            r_cyl: parseFloat(document.getElementById('r-cyl').value),
+            r_axis: parseInt(document.getElementById('r-axis').value),
+            l_sph: parseFloat(document.getElementById('l-sph').value),
+            l_cyl: parseFloat(document.getElementById('l-cyl').value),
+            l_axis: parseInt(document.getElementById('l-axis').value),
+        };
 
-    if (error) {
-        alert("Error Saving!! " + error.message);
-    } else {
+        let error;
+        if (editingRecordId) {
+            ({ error } = await supabaseClient
+                .from('prescriptions')
+                .update(recordData)
+                .eq('id', editingRecordId));
+            if (!error) showToast('✓ Checkup updated successfully', 'success');
+        } else {
+            ({ error } = await supabaseClient
+                .from('prescriptions')
+                .insert([recordData]));
+            if (!error) showToast('✓ Checkup saved successfully', 'success');
+        }
+
+        if (error) throw error;
+
         document.getElementById('full-record-form').reset();
         closeRecordModal();
         await checkUser();
+    } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
     }
 });
 
-window.deletePrescription = async function(id) {
-    if (!confirm("Are you sure?")) return;
+window.deletePrescription = debounce(async function(id) {
+    if (!confirm("Are you sure you want to delete this checkup record?")) return;
 
-    const { error } = await supabaseClient.from('prescriptions').delete().eq('id', id);
-    if (error) {
-        alert("Error Deleting!! " + error.message);
-    } else {
+    showLoading(true);
+    try {
+        const { error } = await supabaseClient.from('prescriptions').delete().eq('id', id);
+        if (error) throw error;
+        showToast('✓ Record deleted successfully', 'success');
         await checkUser();
+    } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}, 500);
+
+window.editPrescription = async function(id) {
+    try {
+        const { data: record, error } = await supabaseClient
+            .from('prescriptions')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        document.getElementById('record-date').value = record.date;
+        document.getElementById('r-sph').value = record.r_sph;
+        document.getElementById('r-cyl').value = record.r_cyl;
+        document.getElementById('r-axis').value = record.r_axis;
+        document.getElementById('l-sph').value = record.l_sph;
+        document.getElementById('l-cyl').value = record.l_cyl;
+        document.getElementById('l-axis').value = record.l_axis;
+
+        window.openRecordModal(id);
+    } catch (err) {
+        showToast('Error loading record: ' + err.message, 'error');
     }
 };
 // Countdown Timer
@@ -352,6 +471,10 @@ async function checkUser() {
             }
             if (typeof loadProfileData === "function") {
                 await loadProfileData(user.id);
+                // Add listeners to save profile data
+                document.getElementById('user-name')?.addEventListener('blur', () => saveProfileData(user.id));
+                document.getElementById('user-age')?.addEventListener('blur', () => saveProfileData(user.id));
+                document.getElementById('user-sex')?.addEventListener('change', () => saveProfileData(user.id));
             }
         } else {
             heroSection.style.display = 'flex';
@@ -372,29 +495,121 @@ async function checkUser() {
 
 checkUser();
 
-// Fetching Data
+// Filter prescriptions
+window.filterPrescriptions = async function() {
+    const startDate = document.getElementById('filter-start-date')?.value;
+    const endDate = document.getElementById('filter-end-date')?.value;
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
-async function loadPrescriptionHistory(userId) {
-    const { data, error } = await supabaseClient
-        .from('prescriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('date', { ascending: false });
-
-    if (error) {
-        console.error('Error fetching history:', error);
-        return null;
+    if (!startDate || !endDate) {
+        showToast('Please select both start and end dates', 'warning');
+        return;
     }
 
+    showLoading(true);
+    try {
+        let query = supabaseClient
+            .from('prescriptions')
+            .select('*')
+            .eq('user_id', user.id);
+
+        if (startDate) query = query.gte('date', startDate);
+        if (endDate) query = query.lte('date', endDate);
+
+        const { data, error } = await query.order('date', { ascending: false });
+        if (error) throw error;
+
+        displayPrescriptions(data);
+    } catch (err) {
+        showToast('Error filtering: ' + err.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+};
+
+// Clear filter
+window.clearFilter = async function() {
+    document.getElementById('filter-start-date').value = '';
+    document.getElementById('filter-end-date').value = '';
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    await loadPrescriptionHistory(user.id);
+    showToast('Filter cleared', 'info');
+};
+
+// Calculate vision analysis
+function calculateVisionAnalysis(data) {
+    if (data.length < 2) return null;
+
+    const latest = data[0];
+    const oldest = data[data.length - 1];
+
+    const rSphChange = latest.r_sph - oldest.r_sph;
+    const lSphChange = latest.l_sph - oldest.l_sph;
+    const avgChange = (rSphChange + lSphChange) / 2;
+
+    return {
+        rightEyeTrend: rSphChange > 0.5 ? 'worsening' : rSphChange < -0.5 ? 'improving' : 'stable',
+        leftEyeTrend: lSphChange > 0.5 ? 'worsening' : lSphChange < -0.5 ? 'improving' : 'stable',
+        rightChange: rSphChange.toFixed(2),
+        leftChange: lSphChange.toFixed(2),
+        avgChange: avgChange.toFixed(2),
+        records: data.length,
+        dateRange: `${oldest.date} to ${latest.date}`
+    };
+}
+
+// Display analysis
+function showVisionAnalysis(data) {
+    const analysis = calculateVisionAnalysis(data);
+    if (!analysis) {
+        document.getElementById('analysis-section').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Need at least 2 records for analysis</p>';
+        return;
+    }
+
+    const trendEmoji = {
+        worsening: '📉',
+        improving: '📈',
+        stable: '➡️'
+    };
+
+    document.getElementById('analysis-section').innerHTML = `
+        <div class="analysis-card">
+            <h3>📊 Vision Analysis</h3>
+            <div class="analysis-grid">
+                <div class="analysis-item">
+                    <span class="analysis-label">Right Eye (OD)</span>
+                    <span class="analysis-value">${trendEmoji[analysis.rightEyeTrend]} ${analysis.rightEyeTrend.toUpperCase()}</span>
+                    <small>${analysis.rightChange > 0 ? '+' : ''}${analysis.rightChange} SPH</small>
+                </div>
+                <div class="analysis-item">
+                    <span class="analysis-label">Left Eye (OS)</span>
+                    <span class="analysis-value">${trendEmoji[analysis.leftEyeTrend]} ${analysis.leftEyeTrend.toUpperCase()}</span>
+                    <small>${analysis.leftChange > 0 ? '+' : ''}${analysis.leftChange} SPH</small>
+                </div>
+                <div class="analysis-item">
+                    <span class="analysis-label">Records Tracked</span>
+                    <span class="analysis-value">${analysis.records}</span>
+                    <small>${analysis.dateRange}</small>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Display prescriptions
+function displayPrescriptions(data) {
     const grid = document.getElementById('history-grid');
-    if (!grid) return null;
-    
+    if (!grid) return;
+
     grid.innerHTML = '';
 
     if (data.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No records found in the archive.</p>';
-        return data;
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No records found.</p>';
+        showVisionAnalysis([]);
+        return;
     }
+
+    showVisionAnalysis(data);
 
     data.forEach((entry, index) => {
         const recordNum = (data.length - index).toString().padStart(2, '0');
@@ -417,15 +632,136 @@ async function loadPrescriptionHistory(userId) {
                         <p>AXIS: ${entry.l_axis}</p>
                     </div>
                 </div>
-                <button class="delete-folder-btn" onclick="deletePrescription('${entry.id}')">
-                    <i class="fas fa-trash-alt"></i> PURGE_FILE
-                </button>
+                <div class="card-actions">
+                    <button class="action-btn edit-btn" onclick="editPrescription('${entry.id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn print-btn" onclick="printPrescription('${entry.id}')">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deletePrescription('${entry.id}')">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
             </div>
         `;
         grid.insertAdjacentHTML('beforeend', card);
     });
-    return data;
 }
+// Profile Functions
+async function saveProfileData(userId) {
+    const name = document.getElementById('user-name').value;
+    const age = document.getElementById('user-age').value;
+    const sex = document.getElementById('user-sex').value;
+
+    try {
+        const { error } = await supabaseClient
+            .from('user_profiles')
+            .upsert({ user_id: userId, name, age, sex }, { onConflict: 'user_id' });
+
+        if (error) throw error;
+        showToast('✓ Profile saved successfully', 'success');
+    } catch (err) {
+        showToast('Error saving profile: ' + err.message, 'error');
+    }
+}
+
 async function loadProfileData(userId) {
-    console.log("Loading profile for user:", userId);
+    try {
+        const { data, error } = await supabaseClient
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+        if (data) {
+            document.getElementById('user-name').value = data.name || '';
+            document.getElementById('user-age').value = data.age || '';
+            document.getElementById('user-sex').value = data.sex || '';
+        }
+    } catch (err) {
+        console.log('No profile data found, using defaults');
+    }
 }
+
+// Load prescription history
+async function loadPrescriptionHistory(userId) {
+    showLoading(true);
+    try {
+        const { data, error } = await supabaseClient
+            .from('prescriptions')
+            .select('*')
+            .eq('user_id', userId)
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        displayPrescriptions(data);
+        return data;
+    } catch (err) {
+        showToast('Error loading records: ' + err.message, 'error');
+        return null;
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Print prescription
+window.printPrescription = function(recordId) {
+    const card = document.querySelector(`[data-record-id="${recordId}"]`);
+    if (!card) {
+        const cards = document.querySelectorAll('.folder-card');
+        for (let c of cards) {
+            if (c.innerHTML.includes(recordId)) {
+                card = c;
+                break;
+            }
+        }
+    }
+
+    if (!card) return showToast('Record not found', 'error');
+
+    const printWindow = window.open('', '', 'width=800,height=600');
+    const date = card.querySelector('.folder-date')?.textContent || 'Unknown Date';
+    const content = card.querySelector('.folder-content')?.innerHTML || '';
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>OpticLog - Prescription</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #fff; padding: 40px 20px; }
+                .container { max-width: 600px; margin: 0 auto; border: 2px solid #00ff41; padding: 30px; background: #1a1a1a; }
+                h2 { color: #00ff41; text-shadow: 0 0 10px #00ff41; margin-bottom: 20px; }
+                .print-date { color: #999; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                .folder-content { margin: 20px 0; }
+                .eye-data { background: rgba(0,255,65,0.1); padding: 15px; margin: 10px 0; border-left: 3px solid #00ff41; }
+                .eye-data h4 { color: #00ff41; margin-bottom: 8px; }
+                .eye-data p { margin: 4px 0; font-size: 0.95rem; }
+                .footer { text-align: center; margin-top: 30px; color: #999; font-size: 0.85rem; }
+                @media print {
+                    body { padding: 0; background: white; }
+                    .container { border: 1px solid #000; }
+                    .print-date { border-color: #000; }
+                    .eye-data { background: #f5f5f5; border-left-color: #000; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>📋 OpticLog - Prescription Report</h2>
+                <p class="print-date">${date} | Generated: ${new Date().toLocaleDateString()}</p>
+                <div class="folder-content">${content}</div>
+                <div class="footer">This is a personal copy of your eye prescription. For official use, consult your optometrist.</div>
+            </div>
+            <script>
+                setTimeout(() => { window.print(); }, 100);
+                window.onafterprint = () => window.close();
+            </script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+};

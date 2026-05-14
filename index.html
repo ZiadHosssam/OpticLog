@@ -56,12 +56,37 @@
             </div>
         </div>
 
-        <!-- Medical Action Buttons -->
-        <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <!-- Medical Action Buttons & Filter -->
+        <div class="action-bar">
             <h2><i class="fas fa-archive"></i> Check-Up Data </h2>
             <button onclick="openRecordModal()" class="cta-button">
                 <i class="fas fa-file-medical"></i> New Entry
             </button>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3><i class="fas fa-filter"></i> Filter by Date Range</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>From:</label>
+                    <input type="date" id="filter-start-date">
+                </div>
+                <div class="filter-group">
+                    <label>To:</label>
+                    <input type="date" id="filter-end-date">
+                </div>
+                <button onclick="filterPrescriptions()" class="filter-btn">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+                <button onclick="clearFilter()" class="filter-btn clear-btn">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Analysis Section -->
+        <div id="analysis-section" class="analysis-section">
         </div>
 
         <!-- History -->
@@ -95,13 +120,13 @@
                             </div>
 
                             <div style="margin-bottom: 1rem;">
-                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (0 to +6)</label>
-                                <input type="number" id="r-cyl" placeholder="Cylinder" step="0.25" min="0" max="6" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (-8 to 0)</label>
+                                <input type="number" id="r-cyl" placeholder="Cylinder" step="0.25" min="-8" max="0" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
                             </div>
 
                             <div>
-                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (0-359°)</label>
-                                <input type="number" id="r-axis" placeholder="Axis" min="0" max="359" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (1-180°)</label>
+                                <input type="number" id="r-axis" placeholder="Axis" min="1" max="180" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
                             </div>
                         </div>
                     </div>
@@ -117,13 +142,13 @@
                             </div>
 
                             <div style="margin-bottom: 1rem;">
-                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (0 to +6)</label>
-                                <input type="number" id="l-cyl" placeholder="Cylinder" step="0.25" min="0" max="6" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (-8 to 0)</label>
+                                <input type="number" id="l-cyl" placeholder="Cylinder" step="0.25" min="-8" max="0" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
                             </div>
 
                             <div>
-                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (0-359°)</label>
-                                <input type="number" id="l-axis" placeholder="Axis" min="0" max="359" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (1-180°)</label>
+                                <input type="number" id="l-axis" placeholder="Axis" min="1" max="180" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
                             </div>
                         </div>
                     </div>

@@ -137,7 +137,7 @@ document.getElementById('full-record-form')?.addEventListener('submit', async (e
     } else {
         document.getElementById('full-record-form').reset();
         closeRecordModal();
-        loadPrescriptionHistory(user.id);
+        checkUser();
     }
 });
 
@@ -187,25 +187,17 @@ function startCountdown(targetDate) {
 }
 
 async function sendCheckupReminder(userEmail, userName) {
-    const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            from: "OpticLog <onboarding@resend.dev>",
-            to: [userEmail],
-            subject: "OPTIC_LOG: Check-Up Needed Brother",
-            html: `<h1>Time for a check-up!</h1><p>Hey ${userName}, it has been 3 months since your last scan.</p>`
-        })
-    });
+    try {
+        const { data, error } = await supabaseClient.functions.invoke('send-reminder', {
+            body: { userEmail, userName },
+        });
 
-    if (res.ok) {
-        console.log("Reminder email dispatched.");
+        if (error) throw error;
+        console.log("Reminder email dispatched via Supabase Edge Function.");
+    } catch (err) {
+        console.error("Function invocation failed:", err.message);
     }
 }
-
 // Controling Landing Page
 
 async function checkUser() {
@@ -230,6 +222,11 @@ async function checkUser() {
                 if (diffDays >= 90) {
                     sendCheckupReminder(user.email, 'Valued Member');
                 }
+            }
+            else {
+                const timerDisplay = document.getElementById('countdown-timer');
+                timerDisplay.innerHTML = "DEADLINE ARRIVED";
+                timerDisplay.style.color = "#ff4b2b";
             }
             if (typeof loadProfileData === "function") {
                 await loadProfileData(user.id);

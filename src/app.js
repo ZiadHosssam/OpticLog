@@ -1,4 +1,6 @@
 import {config} from './config.js';
+let countdownInterval;
+
 const apiKey = import.meta.env.VITE_RESEND_API_KEY;
 const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
@@ -155,6 +157,8 @@ window.deletePrescription = async function(id) {
 function startCountdown(targetDate) {
     const timerDisplay = document.getElementById('countdown-timer');
 
+    if (countdownInterval) clearInterval(countdownInterval);
+
     function updateTimer(){
         const now = new Date().getTime();
         const distance = new Date(targetDate).getTime() - now;
@@ -179,7 +183,7 @@ function startCountdown(targetDate) {
         timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
     }
     updateTimer();
-    setInterval(updateTimer, 1000)
+    countdownInterval = setInterval(updateTimer, 1000)
 }
 
 async function sendCheckupReminder(userEmail, userName) {
@@ -187,7 +191,7 @@ async function sendCheckupReminder(userEmail, userName) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${apikey}`
+            "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
             from: "OpticLog <onboarding@resend.dev>",
@@ -227,20 +231,18 @@ async function checkUser() {
                     sendCheckupReminder(user.email, 'Valued Member');
                 }
             }
-            await loadPrescriptionHistory(user.id);
             if (typeof loadProfileData === "function") {
                 await loadProfileData(user.id);
             }
-            const target = new Date();
-            target.setFullYear(target.getFullYear() + 1);
-            startCountdown(target);
-
         } else {
             heroSection.style.display = 'flex';
             dashboardArea.style.display = 'none';
             profileBtn.style.display = 'none';
             loginNavBtn.style.display = 'block';
             signupNavBtn.style.display = 'block';
+            const defaultTargetDate = new Date();
+            defaultTargetDate.setMonth(defaultTargetDate.getMonth() + 3);
+            startCountdown(defaultTargetDate);
         }
     } catch (err) {
         console.error("Authentication check failed:", err.message);

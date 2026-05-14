@@ -159,6 +159,8 @@ function startCountdown(targetDate) {
 
     if (countdownInterval) clearInterval(countdownInterval);
 
+    timerDisplay.style.color = "#00ff41";
+    timerDisplay.style.fontSize = "2.5rem";
     function updateTimer(){
         const now = new Date().getTime();
         const distance = new Date(targetDate).getTime() - now;

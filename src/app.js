@@ -79,42 +79,49 @@ window.generatePDF = async function() {
     doc.setTextColor(0, 255, 136);
     doc.text("Optic-Log: Check-Up History", 14, 20);
 
-
     doc.setFontSize(12);
     doc.setTextColor(100);
-    doc.text(`Name: ${user.name}`, 14, 30);
-    doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 37);
 
+    const profileName = document.getElementById('user-name').value || user.name || 'N/A';
+    const profileAge = document.getElementById('user-age').value || 'N/A';
+    const profileSex = document.getElementById('user-sex').value || 'N/A';
 
-    const tableColumn = ["DATE", "R_SPH", "R_CYL", "R_AXIS", "L_SPH", "L_CYL", "L_AXIS"];
-    const tableRows = [];
+    doc.text(`Name: ${profileName}`, 14, 30);
+    doc.text(`Age: ${profileAge}`, 14, 37);
+    doc.text(`Sex: ${profileSex}`, 14, 44);
+    doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 51);
 
+    let currentY = 60;
 
-    prescriptions.forEach(record => {
-        const recordData = [
-            record.date,
-            record.r_sph.toFixed(2),
-            record.r_cyl.toFixed(2),
-            record.r_axis,
-            record.l_sph.toFixed(2),
-            record.l_cyl.toFixed(2),
-            record.l_axis
-        ];
-        tableRows.push(recordData);
+    prescriptions.forEach((record, index) => {
+        if (currentY > 250) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        doc.setDrawColor(0, 255, 136);
+        doc.setLineWidth(0.5);
+        doc.rect(14, currentY, 182, 40);
+
+        doc.setFont("courier", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 255, 136);
+        doc.text(`Check-Up #${index + 1} - ${record.date}`, 18, currentY + 8);
+
+        doc.setFont("courier", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+
+        doc.text(`RIGHT (OD): SPH ${record.r_sph.toFixed(2)} | CYL ${record.r_cyl.toFixed(2)} | AXIS ${record.r_axis}`, 18, currentY + 18);
+        doc.text(`LEFT (OS):  SPH ${record.l_sph.toFixed(2)} | CYL ${record.l_cyl.toFixed(2)} | AXIS ${record.l_axis}`, 18, currentY + 28);
+
+        currentY += 48;
     });
 
-    doc.autoTable({
-        startY: 45,
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 255, 136], textColor: [0, 0, 0] }, // Green header
-        styles: { font: "courier" },
-    });
-
-    const finalY = doc.lastAutoTable.finalY || 45;
+    currentY += 10;
     doc.setFontSize(10);
-    doc.text("--- End Of Check-Ups ---", 14, finalY + 10);
+    doc.setTextColor(100);
+    doc.text("--- End Of Check-Ups ---", 14, currentY);
 
     doc.save(`OpticLog_Report_${user.id.substring(0, 5)}.pdf`);
 }

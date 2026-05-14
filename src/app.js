@@ -72,17 +72,17 @@ window.generatePDF = async function() {
     }
 
     const {jsPDF} = window.jspdf;
-    const doc = new.jsPDF();
+    const doc = new jsPDF();
 
     doc.setFont("courier", "bold");
-    doc.setFontSize("22");
-    doc.setTextColor("0, 255", "136");
+    doc.setFontSize(22);
+    doc.setTextColor(0, 255, 136);
     doc.text("Optic-Log: Check-Up History", 14, 20);
 
 
     doc.setFontSize(12);
     doc.setTextColor(100);
-    doc.text('Name: ${user.name}', 14, 30);
+    doc.text(`Name: ${user.name}`, 14, 30);
     doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 37);
 
 
@@ -100,7 +100,7 @@ window.generatePDF = async function() {
             record.l_cyl.toFixed(2),
             record.l_axis
         ];
-        tableRows.push(recordData)
+        tableRows.push(recordData);
     });
 
     doc.autoTable({
@@ -151,8 +151,7 @@ window.login = async function () {
 
     if (error) {
         alert(error.message);
-    }
-    else{
+    } else {
         closeLoginModal();
         checkUser();
     }
@@ -201,14 +200,14 @@ document.getElementById('full-record-form')?.addEventListener('submit', async (e
 });
 
 window.deletePrescription = async function(id) {
-    if (!confirm("Are Sure Brother?")) return;
+    if (!confirm("Are you sure?")) return;
 
-    const{error} = await supabaseClient.from('prescriptions').delete().eq('id',id);
-    if (error){
+    const { error } = await supabaseClient.from('prescriptions').delete().eq('id', id);
+    if (error) {
         alert("Error Deleting!! " + error.message);
     }
     else {
-        const{data:{user}} = await supabaseClient.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         loadPrescriptionHistory(user.id);
     }
 };
@@ -244,7 +243,7 @@ function startCountdown(targetDate) {
         timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
     }
     updateTimer();
-    countdownInterval = setInterval(updateTimer, 1000)
+    countdownInterval = setInterval(updateTimer, 1000);
 }
 
 async function sendCheckupReminder(userEmail, userName) {
@@ -322,17 +321,17 @@ async function loadPrescriptionHistory(userId) {
 
     if (error) {
         console.error('Error fetching history:', error);
-        return;
+        return null;
     }
 
     const grid = document.getElementById('history-grid');
-    if (!grid) return;
+    if (!grid) return null;
     
     grid.innerHTML = '';
 
     if (data.length === 0) {
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No records found in the archive.</p>';
-        return;
+        return data;
     }
 
     data.forEach((entry, index) => {

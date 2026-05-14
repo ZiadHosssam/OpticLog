@@ -60,6 +60,65 @@ window.toggleProfile = function() {
     }
 };
 
+window.generatePDF = async function() {
+    const {data: { user }} = await supabaseClient.auth.getUser();
+    if (!user) return alert("Please Login First!");
+
+    const {data: prescriptions, error} = await supabaseClient.from('prescriptions').select('*').eq('user_id', user.id).order('date', { ascending: false });
+
+    if (error || !prescriptions || prescriptions.length === 0) {
+        alert("No records found to export.");
+        return;
+    }
+
+    const {jsPDF} = window.jspdf;
+    const doc = new.jsPDF();
+
+    doc.setFont("courier", "bold");
+    doc.setFontSize("22");
+    doc.setTextColor("0, 255", "136");
+    doc.text("Optic-Log: Check-Up History", 14, 20);
+
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text('Name: ${user.name}', 14, 30);
+    doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 37);
+
+
+    const tableColumn = ["DATE", "R_SPH", "R_CYL", "R_AXIS", "L_SPH", "L_CYL", "L_AXIS"];
+    const tableRows = [];
+
+
+    prescriptions.forEach(record => {
+        const recordData = [
+            record.date,
+            record.r_sph.toFixed(2),
+            record.r_cyl.toFixed(2),
+            record.r_axis,
+            record.l_sph.toFixed(2),
+            record.l_cyl.toFixed(2),
+            record.l_axis
+        ];
+        tableRows.push(recordData)
+    });
+
+    doc.autoTable({
+        startY: 45,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 255, 136], textColor: [0, 0, 0] }, // Green header
+        styles: { font: "courier" },
+    });
+
+    const finalY = doc.lastAutoTable.finalY || 45;
+    doc.setFontSize(10);
+    doc.text("--- End Of Check-Ups ---", 14, finalY + 10);
+
+    doc.save(`OpticLog_Report_${user.id.substring(0, 5)}.pdf`);
+}
+
 // Login & Logout & Signup
 
 window.signUp = async function() {

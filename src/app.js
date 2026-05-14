@@ -221,34 +221,71 @@ window.deletePrescription = async function(id) {
 // Countdown Timer
 function startCountdown(targetDate) {
     const timerDisplay = document.getElementById('countdown-timer');
+    const countdownCard = document.querySelector('.countdown-card');
 
     if (countdownInterval) clearInterval(countdownInterval);
 
-    timerDisplay.style.color = "#00ff41";
-    timerDisplay.style.fontSize = "2.5rem";
     function updateTimer(){
         const now = new Date().getTime();
         const distance = new Date(targetDate).getTime() - now;
 
+        let statusText = '';
+        let statusColor = '';
+        let cardClass = 'status-normal';
+
         if (distance < 0) {
-            timerDisplay.innerHTML = "DEADLINE ARRIVED";
-            timerDisplay.style.color = "#ff4b2b";
-            timerDisplay.style.fontSize = "3rem";
-            return;
+            const overdueMs = Math.abs(distance);
+            const overdueDays = Math.floor(overdueMs / (1000 * 60 * 60 * 24));
+            timerDisplay.innerHTML = `${String(overdueDays).padStart(3, '0')}:OVERDUE`;
+            statusText = '⚠️ CHECKUP OVERDUE';
+            statusColor = '#ff4b2b';
+            cardClass = 'status-overdue';
+        } else if (distance < 7 * 24 * 60 * 60 * 1000) {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const d = String(days).padStart(2, '0');
+            const h = String(hours).padStart(2, '0');
+            const m = String(minutes).padStart(2, '0');
+            const s = String(seconds).padStart(2, '0');
+
+            timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
+            statusText = '🟡 DUE SOON';
+            statusColor = '#ffb700';
+            cardClass = 'status-warning';
+        } else {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const d = String(days).padStart(3, '0');
+            const h = String(hours).padStart(2, '0');
+            const m = String(minutes).padStart(2, '0');
+            const s = String(seconds).padStart(2, '0');
+
+            timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
+            statusText = '✓ CHECKUP SCHEDULED';
+            statusColor = '#00ff41';
+            cardClass = 'status-normal';
         }
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        timerDisplay.style.color = statusColor;
 
-        const d = String(days).padStart(3, '0');
-        const h = String(hours).padStart(2, '0');
-        const m = String(minutes).padStart(2, '0');
-        const s = String(seconds).padStart(2, '0');
-
-        timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
+        if (countdownCard) {
+            countdownCard.className = `countdown-card ${cardClass}`;
+            const statusDiv = countdownCard.querySelector('.countdown-status') || document.createElement('div');
+            if (!countdownCard.querySelector('.countdown-status')) {
+                statusDiv.className = 'countdown-status';
+                countdownCard.insertBefore(statusDiv, countdownCard.querySelector('p'));
+            }
+            statusDiv.innerHTML = statusText;
+            statusDiv.style.color = statusColor;
+        }
     }
+
     updateTimer();
     countdownInterval = setInterval(updateTimer, 1000);
 }

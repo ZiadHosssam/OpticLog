@@ -491,6 +491,26 @@ p {
     outline: none;
 }
 
+.modal-content input[type="number"] {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 10px;
+    color: var(--text-main);
+}
+
+.modal-content input[type="number"]:focus {
+    border-color: var(--primary);
+    background: #0a0a0a;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.modal-content input[type="date"] {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 12px;
+    color: var(--text-main);
+}
+
 .modal-btn {
     font-family: var(--font-pixel);
     background: var(--primary);

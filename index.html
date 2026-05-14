@@ -74,33 +74,63 @@
 
     <!-- New Record -->
     <div id="record-modal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 650px;">
             <span onclick="closeRecordModal()" class="close"><i class="fas fa-times"></i></span>
-            <h2>Create New Log</h2>
+            <h2>📋 Create New Check-Up Log</h2>
             <form id="full-record-form" class="form-group">
-                <div style="text-align: left; margin-bottom: 1rem;">
-                    <label style="font-family: var(--font-pixel); color: var(--primary);">EXAM_DATE:</label>
-                    <input type="date" id="record-date" required style="width: 100%;">
+                <div style="text-align: left; margin-bottom: 1.5rem;">
+                    <label style="font-family: var(--font-pixel); color: var(--primary); font-size: 1.1rem;">EXAM_DATE:</label>
+                    <input type="date" id="record-date" required style="width: 100%; padding: 12px; margin-top: 0.5rem; border-radius: 4px;">
                 </div>
-                
-                <div class="form-row" style="display: flex; gap: 20px;">
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
                     <!-- Right Eye Group -->
-                    <div class="eye-input-group" style="flex: 1;">
-                        <h3 style="font-size: 1.2rem; margin-bottom: 10px;">RIGHT (OD)</h3>
-                        <input type="number" id="r-sph" placeholder="SPH" step="0.25" required>
-                        <input type="number" id="r-cyl" placeholder="CYL" step="0.25" required>
-                        <input type="number" id="r-axis" placeholder="AXIS" required>
+                    <div class="eye-input-group">
+                        <div style="background: rgba(0, 255, 65, 0.1); padding: 1rem; border-radius: 4px; border-left: 3px solid var(--primary);">
+                            <h3 style="font-size: 1.3rem; margin-bottom: 1rem; font-family: var(--font-pixel); color: var(--primary);">RIGHT (OD)</h3>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">SPH (-20 to +20)</label>
+                                <input type="number" id="r-sph" placeholder="Sphere" step="0.25" min="-20" max="20" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (0 to +6)</label>
+                                <input type="number" id="r-cyl" placeholder="Cylinder" step="0.25" min="0" max="6" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+
+                            <div>
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (0-359°)</label>
+                                <input type="number" id="r-axis" placeholder="Axis" min="0" max="359" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+                        </div>
                     </div>
+
                     <!-- Left Eye Group -->
-                    <div class="eye-input-group" style="flex: 1;">
-                        <h3 style="font-size: 1.2rem; margin-bottom: 10px;">LEFT (OS)</h3>
-                        <input type="number" id="l-sph" placeholder="SPH" step="0.25" required>
-                        <input type="number" id="l-cyl" placeholder="CYL" step="0.25" required>
-                        <input type="number" id="l-axis" placeholder="AXIS" required>
+                    <div class="eye-input-group">
+                        <div style="background: rgba(0, 255, 65, 0.1); padding: 1rem; border-radius: 4px; border-left: 3px solid var(--primary);">
+                            <h3 style="font-size: 1.3rem; margin-bottom: 1rem; font-family: var(--font-pixel); color: var(--primary);">LEFT (OS)</h3>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">SPH (-20 to +20)</label>
+                                <input type="number" id="l-sph" placeholder="Sphere" step="0.25" min="-20" max="20" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">CYL (0 to +6)</label>
+                                <input type="number" id="l-cyl" placeholder="Cylinder" step="0.25" min="0" max="6" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+
+                            <div>
+                                <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">AXIS (0-359°)</label>
+                                <input type="number" id="l-axis" placeholder="Axis" min="0" max="359" required style="width: 100%; padding: 10px; border-radius: 4px; background: #1a1a1a; border: 1px solid #333; color: white;">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="modal-btn" style="width: 100%; margin-top: 20px;">
-                    COMMIT_TO_DATABASE
+
+                <button type="submit" class="modal-btn" style="width: 100%; margin-top: 1rem;">
+                    ✓ COMMIT_TO_DATABASE
                 </button>
             </form>
         </div>

@@ -168,6 +168,28 @@ window.logout = async function() {
     await supabaseClient.auth.signOut();
     location.reload();
 }
+
+window.resetAccount = async function() {
+    if (!confirm("🔴 WARNING: This will DELETE all your checkup records. This action CANNOT be undone!")) return;
+    if (!confirm("Are you ABSOLUTELY sure? Type 'DELETE' to confirm... (Just kidding, click OK again to proceed)")) return;
+
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return alert("Please login first!");
+
+        const { error } = await supabaseClient
+            .from('prescriptions')
+            .delete()
+            .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        alert("✓ All records have been purged from the system.");
+        checkUser();
+    } catch (err) {
+        alert("Error resetting account: " + err.message);
+    }
+}
 // Adding Data
 
 window.openRecordModal = function() {
@@ -181,28 +203,26 @@ window.closeRecordModal = function() {
 document.getElementById('full-record-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const { data: { user } } = await supabaseClient.auth.getUser();
-    
+
     const newRecord = {
         user_id: user.id,
         date: document.getElementById('record-date').value,
-        // Right Eye Data
         r_sph: parseFloat(document.getElementById('r-sph').value),
         r_cyl: parseFloat(document.getElementById('r-cyl').value),
         r_axis: parseInt(document.getElementById('r-axis').value),
-        // Left Eye Data
         l_sph: parseFloat(document.getElementById('l-sph').value),
         l_cyl: parseFloat(document.getElementById('l-cyl').value),
         l_axis: parseInt(document.getElementById('l-axis').value),
     };
 
     const { error } = await supabaseClient.from('prescriptions').insert([newRecord]);
-    
+
     if (error) {
         alert("Error Saving!! " + error.message);
     } else {
         document.getElementById('full-record-form').reset();
         closeRecordModal();
-        checkUser();
+        await checkUser();
     }
 });
 
@@ -212,10 +232,8 @@ window.deletePrescription = async function(id) {
     const { error } = await supabaseClient.from('prescriptions').delete().eq('id', id);
     if (error) {
         alert("Error Deleting!! " + error.message);
-    }
-    else {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        loadPrescriptionHistory(user.id);
+    } else {
+        await checkUser();
     }
 };
 // Countdown Timer

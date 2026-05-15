@@ -707,54 +707,98 @@ async function loadPrescriptionHistory(userId) {
 
 // Print prescription
 window.printPrescription = function(recordId) {
-    const card = document.querySelector(`[data-record-id="${recordId}"]`);
-    if (!card) {
-        const cards = document.querySelectorAll('.folder-card');
-        for (let c of cards) {
-            if (c.innerHTML.includes(recordId)) {
-                card = c;
-                break;
+    const cards = document.querySelectorAll('.folder-card');
+    let cardData = null;
+
+    for (let card of cards) {
+        const deleteBtn = card.querySelector('.delete-btn');
+        if (deleteBtn && deleteBtn.onclick.toString().includes(recordId)) {
+            const date = card.querySelector('.folder-date')?.textContent.replace('DATE: ', '') || 'Unknown';
+            const eyeData = card.querySelectorAll('.eye-data');
+
+            if (eyeData.length >= 2) {
+                const rightEyeText = eyeData[0].innerText;
+                const leftEyeText = eyeData[1].innerText;
+
+                cardData = { date, rightEyeText, leftEyeText };
             }
+            break;
         }
     }
 
-    if (!card) return showToast('Record not found', 'error');
+    if (!cardData) return showToast('Record not found', 'error');
 
     const printWindow = window.open('', '', 'width=800,height=600');
-    const date = card.querySelector('.folder-date')?.textContent || 'Unknown Date';
-    const content = card.querySelector('.folder-content')?.innerHTML || '';
+    const profileName = document.getElementById('user-name').value || 'User';
+    const profileAge = document.getElementById('user-age').value || 'N/A';
+    const profileSex = document.getElementById('user-sex').value || 'N/A';
 
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
             <title>OpticLog - Prescription</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #fff; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; border: 2px solid #00ff41; padding: 30px; background: #1a1a1a; }
-                h2 { color: #00ff41; text-shadow: 0 0 10px #00ff41; margin-bottom: 20px; }
-                .print-date { color: #999; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-                .folder-content { margin: 20px 0; }
-                .eye-data { background: rgba(0,255,65,0.1); padding: 15px; margin: 10px 0; border-left: 3px solid #00ff41; }
-                .eye-data h4 { color: #00ff41; margin-bottom: 8px; }
-                .eye-data p { margin: 4px 0; font-size: 0.95rem; }
-                .footer { text-align: center; margin-top: 30px; color: #999; font-size: 0.85rem; }
+                .container { max-width: 700px; margin: 0 auto; border: 2px solid #00ff41; padding: 30px; background: #1a1a1a; }
+                h1 { color: #00ff41; text-shadow: 0 0 10px #00ff41; font-size: 1.8rem; margin-bottom: 20px; }
+                .header-info { background: rgba(0,255,65,0.1); padding: 15px; border-left: 3px solid #00ff41; margin-bottom: 20px; }
+                .info-row { display: flex; justify-content: space-between; margin: 8px 0; }
+                .info-label { color: #999; font-weight: bold; }
+                .info-value { color: #00ff41; }
+                .eye-section { background: rgba(0,255,65,0.1); padding: 15px; margin: 15px 0; border-left: 3px solid #00ff41; }
+                .eye-section h3 { color: #00ff41; margin-bottom: 10px; }
+                .eye-data { white-space: pre-line; line-height: 1.8; }
+                .footer { text-align: center; margin-top: 30px; color: #999; font-size: 0.85rem; border-top: 1px dashed rgba(0,255,65,0.3); padding-top: 15px; }
                 @media print {
                     body { padding: 0; background: white; }
-                    .container { border: 1px solid #000; }
-                    .print-date { border-color: #000; }
-                    .eye-data { background: #f5f5f5; border-left-color: #000; }
+                    .container { border: 1px solid #000; background: white; color: #000; }
+                    h1, .info-label, .eye-section h3 { color: #000; }
+                    .info-value, .eye-section { color: #000; background: #f5f5f5; border-left-color: #000; }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h2>📋 OpticLog - Prescription Report</h2>
-                <p class="print-date">${date} | Generated: ${new Date().toLocaleDateString()}</p>
-                <div class="folder-content">${content}</div>
-                <div class="footer">This is a personal copy of your eye prescription. For official use, consult your optometrist.</div>
+                <h1>📋 OpticLog - Prescription Report</h1>
+
+                <div class="header-info">
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">${profileName}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Age:</span>
+                        <span class="info-value">${profileAge}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Sex:</span>
+                        <span class="info-value">${profileSex}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Exam Date:</span>
+                        <span class="info-value">${cardData.date}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Generated:</span>
+                        <span class="info-value">${new Date().toLocaleDateString()}</span>
+                    </div>
+                </div>
+
+                <div class="eye-section">
+                    <h3>RIGHT EYE (OD)</h3>
+                    <div class="eye-data">${cardData.rightEyeText}</div>
+                </div>
+
+                <div class="eye-section">
+                    <h3>LEFT EYE (OS)</h3>
+                    <div class="eye-data">${cardData.leftEyeText}</div>
+                </div>
+
+                <div class="footer">
+                    This is a personal copy of your eye prescription. For official medical use, consult your optometrist.
+                </div>
             </div>
             <script>
                 setTimeout(() => { window.print(); }, 100);

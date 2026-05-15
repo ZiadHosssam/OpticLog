@@ -1,73 +1,57 @@
-# OpticLog - Your Personal Vision Archive
+# OpticLog
 
-A secure web application for tracking eye prescriptions and managing vision records.
+A minimal web app for tracking eye prescriptions and managing your vision records.
 
-## Setup Instructions
+## Features
 
-### 1. Clone the Repository
+- *User Authentication** — Secure login with Supabase
+- **Prescription Logging** — Track SPH, CYL, and Axis for both eyes
+- **History Timeline** — View all your prescription records at a glance
+- **Check-up Reminders** — 3-month notifications to stay on top of your eye health
+- **PDF Reports** — Export your prescription history
+- **Email Notifications** — Get reminders sent to your inbox
+- **Responsive Design** — Works seamlessly on desktop and mobile
+
+## Tech Stack
+
+- **Frontend** — Vanilla JavaScript, HTML, CSS
+- **Build** — Vite
+- **Backend** — Supabase (Auth + Database)
+- **Notifications** — Resend API
+
+## Quick Start
+
+### 1. Clone & Install
 ```bash
-git clone <repository-url>
-cd Eye
+git clone https://github.com/ZiadHosssam/OpticLog.git
+cd OpticLog
+npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. Setup Environment
+Copy the example files and add your Supabase credentials:
+```bash
+cp config.example.js src/config.js
+cp .env.example .env
+```
 
-1. Copy the example configuration files:
-   ```bash
-   cp .env.example .env
-   cp config.example.js config.js
-   ```
+Update `src/config.js` and `.env` with your [Supabase](https://supabase.com) credentials.
 
-2. Update `.env` and `config.js` with your Supabase credentials:
-   - Get your Supabase URL and API key from https://supabase.com
-   - Replace the placeholder values in both files
+### 3. Run
+```bash
+npm run dev
+```
 
-### 3. Open the Application
-Simply open `index.html` in your browser or use a local server:
+Open `http://localhost:5173` in your browser.
+
+## Deploy
 
 ```bash
-# Using Python 3
-python -m http.server 8000
-
-# Using Node.js with http-server
-npx http-server
+npm run build
 ```
 
-Then navigate to `http://localhost:8000`
-
-## Project Structure
-
-```
-├── index.html          # Main landing page
-├── app.js             # Application logic
-├── style.css          # Styling
-├── config.js          # Environment configuration (git-ignored)
-├── config.example.js  # Template for config.js
-├── .env               # Environment variables (git-ignored)
-├── .env.example       # Template for .env
-└── .gitignore         # Git ignore rules
-```
-
-## Security
-
-- **Do NOT** commit `.env` or `config.js` files to the repository
-- Always use `.env.example` and `config.example.js` as templates
-- The `.gitignore` file is configured to prevent accidental commits
-
-## Features (Phase 1)
-
-- User authentication with Supabase
-- Prescription logging (SPH, CYL, Axis for both eyes)
-- Prescription history timeline
-- 3-month check-up reminders
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+The `dist` folder is ready for deployment.
 
 ## License
 
-MIT
+ISC

@@ -4,7 +4,7 @@ A minimal web app for tracking eye prescriptions and managing your vision record
 
 ## Features
 
-- *User Authentication** — Secure login with Supabase
+- **User Authentication** — Secure login with Supabase
 - **Prescription Logging** — Track SPH, CYL, and Axis for both eyes
 - **History Timeline** — View all your prescription records at a glance
 - **Check-up Reminders** — 3-month notifications to stay on top of your eye health

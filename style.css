@@ -329,7 +329,7 @@ p {
     border-collapse: collapse;
 }
 
-.retor-table th {
+.retro-table th {
     font-family: var(--font-pixel);
     text-align: left;
     color: var(--primary);
@@ -632,7 +632,7 @@ p {
     margin:1rem 0;
 }
 
-/* Toast Notifications */
+/* Toast Not. */
 .toast {
     position: fixed;
     bottom: 20px;
@@ -694,7 +694,7 @@ p {
     animation: spin 1s linear infinite;
 }
 
-/* Filter Section */
+/* Filters */
 .filter-section {
     background: rgba(0, 255, 65, 0.05);
     border: 1px solid rgba(0, 255, 65, 0.2);
@@ -763,7 +763,7 @@ p {
     color: white;
 }
 
-/* Analysis Section */
+/* Analysis */
 .analysis-section {
     margin-bottom: 2rem;
 }
@@ -817,7 +817,101 @@ p {
     font-size: 0.8rem;
 }
 
-/* Card Action Buttons */
+/* Footer */
+.site-footer {
+    background: rgba(10, 10, 10, 0.95);
+    border-top: 2px solid var(--primary);
+    margin-top: 4rem;
+    padding: 2rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -4px 15px rgba(0, 255, 65, 0.1);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.footer-brand {
+    flex: 1;
+}
+
+.footer-text {
+    font-family: var(--font-pixel);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.footer-link {
+    color: var(--primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.footer-link:hover {
+    text-shadow: 0 0 10px var(--primary);
+    transform: translateY(-2px);
+}
+
+.footer-divider {
+    width: 2px;
+    height: 30px;
+    background: linear-gradient(180deg, transparent, var(--primary), transparent);
+    opacity: 0.5;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.footer-social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-pixel);
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer-social-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3), inset 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+.footer-bottom {
+    border-top: 1px dashed rgba(0, 255, 65, 0.2);
+    padding-top: 1rem;
+    text-align: center;
+}
+
+.footer-credit {
+    font-family: var(--font-pixel);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+}
+
+/* Cards Action */
 .card-actions {
     display: flex;
     gap: 0.5rem;
@@ -892,6 +986,28 @@ p {
 /* Mobile & Tablet Responsive */
 @media (max-width: 768px) {
     body { padding-top: 60px; }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .footer-divider {
+        width: 100%;
+        height: 2px;
+        opacity: 0.3;
+    }
+
+    .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footer-social-link {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
 
     .nav-container { padding: 0.5rem 1rem; }
     .logo { font-size: 1.4rem; }
@@ -971,6 +1087,24 @@ p {
     .nav-btn {
         font-size: 0.9rem;
         padding: 3px 8px;
+    }
+
+    .footer-text {
+        font-size: 0.9rem;
+    }
+
+    .footer-social-link {
+        font-size: 0.8rem;
+        padding: 5px 8px;
+        gap: 0.3rem;
+    }
+
+    .footer-content {
+        gap: 0.8rem;
+    }
+
+    .footer-links {
+        gap: 1rem;
     }
 
     .profile-icon { font-size: 1.2rem; }

@@ -6,7 +6,7 @@ let debounceTimer = null;
 const apiKey = import.meta.env.VITE_RESEND_API_KEY;
 const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
-// Toast Notification System
+// Toast Not.
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -20,7 +20,6 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 4000);
 }
 
-// Debounce helper
 function debounce(func, delay = 300) {
     return function(...args) {
         clearTimeout(debounceTimer);
@@ -28,7 +27,7 @@ function debounce(func, delay = 300) {
     };
 }
 
-// Loading indicator
+// Loading Circle
 function showLoading(show = true) {
     let loader = document.getElementById('global-loader');
     if (!loader) {
@@ -228,7 +227,7 @@ window.logout = async function() {
 }
 
 window.resetAccount = async function() {
-    if (!confirm("🔴 WARNING: This will DELETE all your checkup records. This action CANNOT be undone!")) return;
+    if (!confirm("WARNING: This will DELETE all your checkup records. This action CANNOT be undone!")) return;
     if (!confirm("Are you ABSOLUTELY sure? Click OK again to proceed")) return;
 
     showLoading(true);
@@ -251,16 +250,17 @@ window.resetAccount = async function() {
         showLoading(false);
     }
 }
+
 // Adding Data
 
 window.openRecordModal = function(recordId = null) {
     editingRecordId = recordId;
     if (recordId) {
-        document.querySelector('.modal-content h2').textContent = '✏️ Edit Check-Up Log';
-        document.querySelector('.modal-btn').textContent = '✓ UPDATE_RECORD';
+        document.querySelector('.modal-content h2').textContent = ' Edit Check-Up Log';
+        document.querySelector('.modal-btn').textContent = ' UPDATE_RECORD';
     } else {
-        document.querySelector('.modal-content h2').textContent = '📋 Create New Check-Up Log';
-        document.querySelector('.modal-btn').textContent = '✓ COMMIT_TO_DATABASE';
+        document.querySelector('.modal-content h2').textContent = ' Create New Check-Up Log';
+        document.querySelector('.modal-btn').textContent = ' COMMIT_TO_DATABASE';
         document.getElementById('full-record-form').reset();
     }
     document.getElementById('record-modal').style.display = 'flex';
@@ -323,7 +323,7 @@ window.deletePrescription = debounce(async function(id) {
     try {
         const { error } = await supabaseClient.from('prescriptions').delete().eq('id', id);
         if (error) throw error;
-        showToast('✓ Record deleted successfully', 'success');
+        showToast('Record deleted successfully', 'success');
         await checkUser();
     } catch (err) {
         showToast('Error: ' + err.message, 'error');
@@ -374,7 +374,7 @@ function startCountdown(targetDate) {
             const overdueMs = Math.abs(distance);
             const overdueDays = Math.floor(overdueMs / (1000 * 60 * 60 * 24));
             timerDisplay.innerHTML = `${String(overdueDays).padStart(3, '0')}:OVERDUE`;
-            statusText = '⚠️ CHECKUP OVERDUE';
+            statusText = 'CHECKUP OVERDUE';
             statusColor = '#ff4b2b';
             cardClass = 'status-overdue';
         } else if (distance < 7 * 24 * 60 * 60 * 1000) {
@@ -389,7 +389,7 @@ function startCountdown(targetDate) {
             const s = String(seconds).padStart(2, '0');
 
             timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
-            statusText = '🟡 DUE SOON';
+            statusText = 'DUE SOON';
             statusColor = '#ffb700';
             cardClass = 'status-warning';
         } else {
@@ -404,7 +404,7 @@ function startCountdown(targetDate) {
             const s = String(seconds).padStart(2, '0');
 
             timerDisplay.innerHTML = `${d}:${h}:${m}:${s}`;
-            statusText = '✓ CHECKUP SCHEDULED';
+            statusText = 'CHECKUP SCHEDULED';
             statusColor = '#00ff41';
             cardClass = 'status-normal';
         }
@@ -439,6 +439,7 @@ async function sendCheckupReminder(userEmail, userName) {
         console.error("Function invocation failed:", err.message);
     }
 }
+
 // Controling Landing Page
 
 async function checkUser() {
@@ -495,7 +496,7 @@ async function checkUser() {
 
 checkUser();
 
-// Filter prescriptions
+// Filters
 window.filterPrescriptions = async function() {
     const startDate = document.getElementById('filter-start-date')?.value;
     const endDate = document.getElementById('filter-end-date')?.value;
@@ -527,7 +528,6 @@ window.filterPrescriptions = async function() {
     }
 };
 
-// Clear filter
 window.clearFilter = async function() {
     document.getElementById('filter-start-date').value = '';
     document.getElementById('filter-end-date').value = '';
@@ -536,7 +536,7 @@ window.clearFilter = async function() {
     showToast('Filter cleared', 'info');
 };
 
-// Calculate vision analysis
+// Analysis
 function calculateVisionAnalysis(data) {
     if (data.length < 2) return null;
 
@@ -558,7 +558,6 @@ function calculateVisionAnalysis(data) {
     };
 }
 
-// Display analysis
 function showVisionAnalysis(data) {
     const analysis = calculateVisionAnalysis(data);
     if (!analysis) {
@@ -574,7 +573,7 @@ function showVisionAnalysis(data) {
 
     document.getElementById('analysis-section').innerHTML = `
         <div class="analysis-card">
-            <h3>📊 Vision Analysis</h3>
+            <h3>Vision Analysis</h3>
             <div class="analysis-grid">
                 <div class="analysis-item">
                     <span class="analysis-label">Right Eye (OD)</span>
@@ -596,7 +595,7 @@ function showVisionAnalysis(data) {
     `;
 }
 
-// Display prescriptions
+// Display History
 function displayPrescriptions(data) {
     const grid = document.getElementById('history-grid');
     if (!grid) return;
@@ -648,7 +647,8 @@ function displayPrescriptions(data) {
         grid.insertAdjacentHTML('beforeend', card);
     });
 }
-// Profile Functions
+
+// Profile Sidebar Stuff
 async function saveProfileData(userId) {
     const name = document.getElementById('user-name').value;
     const age = document.getElementById('user-age').value;
@@ -684,7 +684,7 @@ async function loadProfileData(userId) {
     }
 }
 
-// Load prescription history
+
 async function loadPrescriptionHistory(userId) {
     showLoading(true);
     try {
@@ -705,7 +705,6 @@ async function loadPrescriptionHistory(userId) {
     }
 }
 
-// Print prescription
 window.printPrescription = function(recordId) {
     const cards = document.querySelectorAll('.folder-card');
     let cardData = null;

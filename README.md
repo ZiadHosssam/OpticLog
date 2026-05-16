@@ -52,6 +52,26 @@ npm run build
 
 The `dist` folder is ready for deployment.
 
+## How to Contribute
+
+We welcome contributions! Here's how you can help:
+
+1. **Fork the repository** — Click the Fork button on GitHub
+2. **Create a feature branch** — `git checkout -b feature/your-feature-name`
+3. **Make your changes** — Add new features or fix bugs
+4. **Test thoroughly** — Ensure your changes work on desktop and mobile
+5. **Commit with clear messages** — `git commit -m "Add feature: description"`
+6. **Push to your fork** — `git push origin feature/your-feature-name`
+7. **Submit a Pull Request** — Open a PR with a clear description of your changes
+
+### Development Guidelines
+
+- Keep code clean and well-organized
+- Follow existing code style and conventions
+- Test responsiveness across devices
+- Add comments for complex logic
+- Update documentation as needed
+
 ## License
 
 ISC
